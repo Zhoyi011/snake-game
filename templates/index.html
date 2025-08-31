@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>炫彩贪吃蛇 -俊毅制作 </title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- 横屏提示 -->
+    <div id="rotate-message">
+        <div>📱 请横屏游戏</div>
+        <div>旋转手机获得更好的游戏体验！</div>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <h1>炫彩贪吃蛇</h1>
+        </header>
+        
+        <div class="game-container">
+            <div class="game-board">
+                <canvas id="gameCanvas" width="500" height="500"></canvas>
+                <div class="game-over" id="gameOver">
+                    <h2>游戏结束!</h2>
+                    <p id="winnerText"></p>
+                    <p>玩家1得分: <span id="finalScore1">0</span></p>
+                    <p>玩家2得分: <span id="finalScore2">0</span></p>
+                    <button id="restartButton">再来一局</button>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <div class="stats">
+                    <div class="scores-container">
+                        <div class="score">玩家1: <span id="score1">0</span></div>
+                        <div class="score player2">玩家2: <span id="score2">0</span></div>
+                    </div>
+                    <div class="high-score">最高分: <span id="highScore">0</span></div>
+                    
+                    <div class="buttons">
+                        <button id="startButton">开始游戏</button>
+                        <button id="pauseButton">暂停</button>
+                        <button id="resetButton">重置</button>
+                        <button id="modeButton">模式: 单人</button>
+                        <button id="soundButton">音效: 开</button>
+                    </div>
+                </div>
+                
+                <div class="settings">
+                    <div class="game-mode">
+                        <h3>游戏模式</h3>
+                        <div class="speed-option">
+                            <input type="radio" id="modeSingle" name="mode" value="single" checked>
+                            <label for="modeSingle">单人模式</label>
+                        </div>
+                        <div class="speed-option">
+                            <input type="radio" id="modeDual" name="mode" value="dual">
+                            <label for="modeDual">双人模式</label>
+                        </div>
+                    </div>
+                    
+                    <div class="wall-mode">
+                        <h3>墙壁模式</h3>
+                        <div class="speed-option">
+                            <input type="radio" id="wallTurn" name="wall" value="turn" checked>
+                            <label for="wallTurn">碰墙转弯</label>
+                        </div>
+                        <div class="speed-option">
+                            <input type="radio" id="wallDie" name="wall" value="die">
+                            <label for="wallDie">碰墙死亡</label>
+                        </div>
+                    </div>
+                    
+                    <h3>游戏速度</h3>
+                    <div class="speed-selector">
+                        <div class="speed-option">
+                            <input type="radio" id="speedSlow" name="speed" value="slow">
+                            <label for="speedSlow">慢速</label>
+                        </div>
+                        <div class="speed-option">
+                            <input type="radio" id="speedMedium" name="speed" value="medium" checked>
+                            <label for="speedMedium">中速</label>
+                        </div>
+                        <div class="speed-option">
+                            <input type="radio" id="speedFast" name="speed" value="fast">
+                            <label for="speedFast">快速</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="instructions">
+                    <h2>游戏说明</h2>
+                    <p>玩家1使用 ↑ ↓ ← → 方向键控制</p>
+                    <p>玩家2使用 W S A D 键控制</p>
+                    <p>空格键可以暂停/继续游戏</p>
+                    <p>吃到食物可以增加分数和蛇的长度</p>
+                    <p>撞到自己的身体游戏结束</p>
+                    <p class="highlight">碰到墙壁会自动转弯，不会死亡！</p>
+                    
+                    <div class="player-controls">
+                        <div class="player-control">
+                            <h3>玩家1控制</h3>
+                            <p>↑ - 向上移动</p>
+                            <p>↓ - 向下移动</p>
+                            <p>← - 向左移动</p>
+                            <p>→ - 向右移动</p>
+                        </div>
+                        <div class="player-control">
+                            <h3>玩家2控制</h3>
+                            <p>W - 向上移动</p>
+                            <p>S - 向下移动</p>
+                            <p>A - 向左移动</p>
+                            <p>D - 向右移动</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 虚拟摇杆 -->
+    <div class="joystick-container">
+        <div class="dpad" id="dpad1">
+            <div class="dpad-up" data-direction="up">↑</div>
+            <div class="dpad-down" data-direction="down">↓</div>
+            <div class="dpad-left" data-direction="left">←</div>
+            <div class="dpad-right" data-direction="right">→</div>
+            <div class="dpad-center"></div>
+        </div>
+        <div class="dpad" id="dpad2">
+            <div class="dpad-up" data-direction="up">W</div>
+            <div class="dpad-down" data-direction="down">S</div>
+            <div class="dpad-left" data-direction="left">A</div>
+            <div class="dpad-right" data-direction="right">D</div>
+            <div class="dpad-center"></div>
+        </div>
+    </div>
+    
+    <!-- 移动控制按钮 -->
+    <div class="mobile-controls">
+        <div class="mobile-control-btn" id="pauseMobileBtn">⏸️</div>
+        <div class="mobile-control-btn" id="restartMobileBtn">🔄</div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/game.js') }}"></script>
+</body>
+</html>
